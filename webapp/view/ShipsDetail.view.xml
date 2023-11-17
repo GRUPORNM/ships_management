@@ -11,7 +11,6 @@
             <uxap:ObjectPageLayout id="ObjectPageLayout" upperCaseAnchorBar="false">
 
                 <uxap:headerContent>
-
                     <commons:ProcessFlow id="processflow2" scrollable="false" nodes="{pf2>/nodes}" lanes="{ShipsDetail>/lanes}">
                         <commons:nodes>
                             <commons:ProcessFlowNode laneId="{pf2>lane}" nodeId="{pf2>id}" title="{pf2>title}" children="{pf2>children}" state="{pf2>state}" stateText="{pf2>stateText}" texts="{pf2>texts}" focused="{pf2>focused}" />
@@ -29,7 +28,7 @@
                             <uxap:ObjectPageSubSection titleUppercase="false">
                                 <f:SimpleForm id="GeneralInfo" editable="false" layout="ColumnLayout" columnsM="2" columnsL="3" columnsXL="4" class="sapUiTinyMarginTop">
                                     <f:content>
-                                        
+
                                     </f:content>
                                 </f:SimpleForm>
                             </uxap:ObjectPageSubSection>
@@ -61,9 +60,6 @@
                                         <Column>
                                             <Text text="{i18n>product_quantity}" />
                                         </Column>
-                                        <Column>
-                                            <Text text="{i18n>unitsinfo}" />
-                                        </Column>
                                     </columns>
                                     <items>
                                         <ColumnListItem>
@@ -71,8 +67,7 @@
                                                 <ObjectIdentifier text="{path : 'codcompartimento', formatter: '.formatter.codcompartimento'}" />
                                                 <ObjectIdentifier text="{codconta}" />
                                                 <ObjectIdentifier text="{maktx}" />
-                                                <ObjectIdentifier text="{quantprodcomercial}" />
-                                                <ObjectIdentifier text="{unidademedida}" />
+                                                <ObjectIdentifier text="{quantprodcomercial} {unidademedida}" />
                                             </cells>
                                         </ColumnListItem>
                                     </items>
