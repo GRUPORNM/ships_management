@@ -11,13 +11,13 @@
                     <Input id="CodCompartimento" name="CodCompartimento" required="true" enabled="false" />
 
                     <Label text="{i18n>account_code}" />
-                    <Input id="AccountCode" name="AccountCode" required="true"/>
+                    <Input type="Number" id="AccountCode" name="AccountCode" required="true"/>
 
                     <Label text="{i18n>commercial_prod}" />
                     <Input id="CommercialCod" name="CommercialCod" required="true" />
 
                     <Label text="{i18n>product_quantity}" />
-                    <Input id="Quantity" name="Quantity" required="true"/>
+                    <Input type="Number" id="Quantity" name="Quantity" required="true"/>
 
                     <Label text="{i18n>unitsinfo}" />
                     <Select id="unit_vh" items="{/xTQAxSHIPS_UNITS_VH}" selectedItem="{domvalue_l}" required="true" forceSelection="false">
