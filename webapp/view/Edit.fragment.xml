@@ -1,0 +1,56 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:grid="sap.ui.layout"
+    xmlns:l="sap.ui.layout">
+    <Dialog id="EditDialog" afterClose="onAfterClose">
+        <l:Splitter height="450px" width="900px">
+            <grid:Grid defaultSpan="L12 M12 S12" width="auto">
+                <form:SimpleForm id="SimpleFormLoad" title="{i18n>loads}" minWidth="1024" layout="{oDialogInfo.oLayout}" labelSpanL="3" labelSpanM="3" emptySpanL="4" emptySpanM="4" columnsL="2" columnsM="2" maxContainerCols="2" editable="false">
+                    <Label text="{i18n>codcompartimento}" />
+                    <Input id="CodCompartimento" name="CodCompartimento" required="true" enabled="false" />
+
+                    <Label text="{i18n>account_code}" />
+                    <Input id="AccountCode" name="AccountCode" required="true"/>
+
+                    <Label text="{i18n>commercial_prod}" />
+                    <Input id="CommercialCod" name="CommercialCod" required="true" />
+
+                    <Label text="{i18n>product_quantity}" />
+                    <Input id="Quantity" name="Quantity" required="true"/>
+
+                    <Label text="{i18n>unitsinfo}" />
+                    <Select id="unit_vh" items="{/xTQAxSHIPS_UNITS_VH}" selectedItem="{domvalue_l}" required="true" forceSelection="false">
+                        <items>
+                            <core:Item key="{domvalue_l}" text="{domvalue_l}" />
+                        </items>
+                    </Select>
+                </form:SimpleForm>
+            </grid:Grid>
+            <grid:Grid defaultSpan="L12 M12 S12" width="auto">
+                <form:SimpleForm id="SimpleFormDestination" minWidth="1024" title="{i18n>destinations}" layout="{oDialogInfo.oLayout}" labelSpanL="3" labelSpanM="3" emptySpanL="4" emptySpanM="4" columnsL="2" columnsM="2" maxContainerCols="2" editable="false">
+                    <Label text="{i18n>codcompartimento}" />
+                    <Input id="CodCompartimentoDestination" name="CodCompartimentoDestination" required="true" enabled="false" />
+
+                    <Label text="{i18n>name}" />
+                    <Input id="NameDestination" name="NameDestination" required="true" />
+
+                    <Label text="{i18n>location}" />
+                    <Input id="Location" name="Location" required="true"/>
+
+                    <Label text="{i18n>nif}" />
+                    <Input id="DestinationNif" name="DestinationNif" required="true"/>
+
+                    <Label text="{i18n>postalcode}" />
+                    <Input id="PostalCode" name="PostalCode" required="true"/>
+                </form:SimpleForm>
+            </grid:Grid>
+        </l:Splitter>
+        <buttons>
+            <Button id="CancelDestination" text="{i18n>closeDialog}" type="Default" press="onCloseFragment" />
+            <Button id="AddDestination" text="{i18n>addLoad}" type="Emphasized" press="onUpdateLoadAndDestination('A')" />
+            <Button id="UpdateDestination" visible="false" text="{i18n>updateLoad}" type="Emphasized" press="onUpdateLoadAndDestination" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
+

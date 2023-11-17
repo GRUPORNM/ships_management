@@ -1,0 +1,132 @@
+<mvc:View controllerName="shipsmanagement.controller.ShipsDetail"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns:ux="sap.uxap"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:uxap="sap.uxap"
+    xmlns:commons="sap.suite.ui.commons">
+    <Page id="requestDetailPage" floatingFooter="true" showNavButton="true" navButtonPress="onNavBackDetail">
+        <content>
+            <uxap:ObjectPageLayout id="ObjectPageLayout" upperCaseAnchorBar="false">
+
+                <uxap:headerContent>
+
+                    <commons:ProcessFlow id="processflow2" scrollable="false" nodes="{pf2>/nodes}" lanes="{ShipsDetail>/lanes}">
+                        <commons:nodes>
+                            <commons:ProcessFlowNode laneId="{pf2>lane}" nodeId="{pf2>id}" title="{pf2>title}" children="{pf2>children}" state="{pf2>state}" stateText="{pf2>stateText}" texts="{pf2>texts}" focused="{pf2>focused}" />
+                        </commons:nodes>
+
+                        <commons:lanes>
+                            <commons:ProcessFlowLaneHeader laneId="{ShipsDetail>id}" iconSrc="{ShipsDetail>icon}" text="{ShipsDetail>label}" position="{ShipsDetail>position}" state="{ShipsDetail>state}" />
+                        </commons:lanes>
+                    </commons:ProcessFlow>
+                </uxap:headerContent>
+
+                <uxap:sections>
+                    <uxap:ObjectPageSection titleUppercase="false" title="{i18n>generaldata}">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection titleUppercase="false">
+                                <f:SimpleForm id="GeneralInfo" editable="false" layout="ColumnLayout" columnsM="2" columnsL="3" columnsXL="4" class="sapUiTinyMarginTop">
+                                    <f:content>
+                                        
+                                    </f:content>
+                                </f:SimpleForm>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                    <uxap:ObjectPageSection titleUppercase="false" title="{i18n>loads}">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection titleUppercase="false">
+                                <Table id="ShipsLoads" width="100%" class="sapFDynamicPageAlignContent" items="{to_ShipsLoads}" mode="SingleSelectLeft" busyIndicatorDelay="{appView>/delay}" selectionChange="onSelectionChange">
+                                    <headerToolbar>
+                                        <OverflowToolbar>
+                                            <ToolbarSpacer />
+                                            <Button id="AddShipmentLoad" text="{i18n>addLoad}" visible="false" press="onOpenEditFragent('C')" />
+                                            <Button id="EditShipmentLoad" visible="false" enabled="false" text="{i18n>editLoad}" press="onOpenEditFragent('U')" />
+                                            <Button id="DeleteShipmentLoad" visible="false" enabled="false" text="{i18n>cancel}" press="onOpenMessageBox('DS')" />
+                                        </OverflowToolbar>
+                                    </headerToolbar>
+                                    <columns>
+                                        <Column>
+                                            <Text text="{i18n>codcompartimento}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>account_code}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>commercial_prod}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>product_quantity}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>unitsinfo}" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <ObjectIdentifier text="{path : 'codcompartimento', formatter: '.formatter.codcompartimento'}" />
+                                                <ObjectIdentifier text="{codconta}" />
+                                                <ObjectIdentifier text="{maktx}" />
+                                                <ObjectIdentifier text="{quantprodcomercial}" />
+                                                <ObjectIdentifier text="{unidademedida}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                    <uxap:ObjectPageSection titleUppercase="false" title="{i18n>destinations}">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection titleUppercase="false">
+                                <Table id="ShipsDestination" width="100%" class="sapFDynamicPageAlignContent" items="{to_ShipsDestination}" mode="SingleSelectLeft" busyIndicatorDelay="{appView>/delay}" selectionChange="onSelectionChange">
+                                    <headerToolbar>
+                                        <OverflowToolbar>
+                                            <ToolbarSpacer />
+                                            <Button id="AddShipmentDestination" text="{i18n>addLoad}" visible="false" press="onOpenEditFragent('C')" />
+                                            <Button id="EditShipmentDestination" visible="false" enabled="false" text="{i18n>editLoad}" press="onOpenEditFragent('U')" />
+                                            <Button id="DeleteShipmentDestination" visible="false" enabled="false" text="{i18n>cancel}" press="onOpenMessageBox('DS')" />
+                                        </OverflowToolbar>
+                                    </headerToolbar>
+                                    <columns>
+                                        <Column>
+                                            <Text text="{i18n>codcompartimento}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>name}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>location}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>nif}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>cpostal}" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <ObjectIdentifier text="{path : 'codcompartimento', formatter: '.formatter.codcompartimento'}" />
+                                                <ObjectIdentifier text="{nome}" />
+                                                <ObjectIdentifier text="{localidade}" />
+                                                <ObjectIdentifier text="{nif}" />
+                                                <ObjectIdentifier text="{cpostal}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+                </uxap:sections>
+            </uxap:ObjectPageLayout>
+        </content>
+    </Page>
+</mvc:View>

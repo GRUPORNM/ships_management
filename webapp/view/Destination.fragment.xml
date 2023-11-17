@@ -1,0 +1,38 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:grid="sap.ui.layout">
+    <Dialog id="DestinationDialog" title="{i18n>DestinationDialog}">
+        <content>
+            <grid:Grid defaultSpan="L12 M12 S12" width="auto">
+                <form:SimpleForm id="SimpleForm" minWidth="1024" layout="{oDialogInfo.oLayout}" labelSpanL="3" labelSpanM="3" emptySpanL="4" emptySpanM="4" columnsL="2" columnsM="2" maxContainerCols="2" editable="false">
+                    <Label text="{i18n>codcompartimento}" />
+                    <Select id="selectCompartimento" items="{CompartimentoData>/items}" selectedItem="{CompartimentoData>/selectedItem}" required="true">
+                        <items>
+                            <core:Item key="{CompartimentoData>Key}" text="{CompartimentoData>Codcompartimento}" />
+                        </items>
+                    </Select>
+                    <Input id="CodCompartimento" required="true" enabled="false" visible="false"/>
+
+                    <Label text="{i18n>name}" />
+                    <Input id="NameDestination" name="NameDestination" required="true" />
+
+                    <Label text="{i18n>location}" />
+                    <Input id="Location" name="Location" required="true"/>
+
+                    <Label text="{i18n>nif}" />
+                    <Input id="DestinationNif" name="DestinationNif" required="true"/>
+
+                    <Label text="{i18n>postalcode}" />
+                    <Input id="PostalCode" name="PostalCode" required="true"/>
+                </form:SimpleForm>
+            </grid:Grid>
+        </content>
+        <buttons>
+            <Button id="CancelDestination" text="{i18n>closeDialog}" type="Default" press="onCloseFragment" />
+            <Button id="AddDestination" text="{i18n>addLoad}" type="Emphasized" press="onAddDestination" />
+            <Button id="UpdateDestination" visible="false" text="{i18n>updateLoad}" type="Emphasized" press="onUpdateDestination" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
+
