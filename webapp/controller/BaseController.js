@@ -352,11 +352,19 @@ sap.ui.define([
                                         this.checked = false;
                                     }
                                 } else {
-                                    if (oControl.getValue() == "") {
-                                        oControl.setValueState("Error");
-                                        this.checked = false;
-                                    } else {
+                                    if (oField.id == "unidadetransporte") {
                                         oControl.setValueState("None");
+                                        this.checked = true;
+                                    } else if (oField.id == "matricula") {
+                                        oControl.setValueState("None");
+                                        this.checked = true;
+                                    } else {
+                                        if (oControl.getValue() == "") {
+                                            oControl.setValueState("Error");
+                                            this.checked = false;
+                                        } else {
+                                            oControl.setValueState("None");
+                                        }
                                     }
                                 }
                             } catch (error) {
@@ -480,6 +488,7 @@ sap.ui.define([
                                 this.oInput = new sap.m.Input({
                                     id: oField.oId,
                                     name: oField.oName,
+                                    type: oField.oType,
                                     enabled: oField.oEnabled
                                 });
 

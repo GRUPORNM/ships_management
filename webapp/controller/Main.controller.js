@@ -12,7 +12,7 @@ sap.ui.define([
                     Shipeditable: false,
                     busy: false,
                     delay: 0,
-                    oStandard: "tknum,nr_ordem_cliente,transport_type,vsartxt,isencaoisp,matricula,regimealfandega,dataprevistacarregamento",
+                    oStandard: "tknum,nr_ordem_cliente,transport_type,vsartxt,isencaoisp,regimealfandega,dataprevistacarregamento",
                     oSmartTableView: "",
                     variantInput: "Standard"
                 });

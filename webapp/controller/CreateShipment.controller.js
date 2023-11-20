@@ -114,6 +114,7 @@ sap.ui.define([
                         oName: "AccountCode",
                         oRequired: true,
                         oValue: "",
+                        oType: "Number",
                         oSelectedKey: "",
                         oEnabled: true,
                         oControl: sap.m.Input,
@@ -136,6 +137,7 @@ sap.ui.define([
                         oName: "Quantity",
                         oRequired: true,
                         oValue: "",
+                        oType: "Number",
                         oSelectedKey: "",
                         oEnabled: true,
                         oControl: sap.m.Input,
@@ -492,7 +494,8 @@ sap.ui.define([
 
             onCreateShipment: function () {
                 var aControl = [],
-                    aContainers = [];
+                    aContainers = [],
+                    matricula;
 
                 aControl.push(sap.m.Input, sap.m.DatePicker);
                 aContainers.push("GeneralInfo");
@@ -514,7 +517,7 @@ sap.ui.define([
                             Isencaoisp: this.byId("isencaoisp").getSelectedKey(),
                             Nacionalidademotorista: "PT",
                             Cartaconducaomotorista: "0000000000000000",
-                            Matricula: this.byId("unidadetransporte").getValue(),
+                            Matricula: "",
                             Toloads: [
                                 {
 
@@ -526,6 +529,10 @@ sap.ui.define([
                                 }
                             ]
                         };
+
+                    if (this.byId("unidadetransporte").getValue()) {
+                        oEntry.Matricula = this.byId("unidadetransporte").getValue();
+                    }
 
                     oEntry.Toloads = this.getModel("LoadData").oData.items;
                     oEntry.Todestinations = this.getModel("DestinationData").oData.items;

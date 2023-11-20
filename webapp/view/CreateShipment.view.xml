@@ -48,7 +48,7 @@
                         <DateTimePicker id="dataprevistacarregamento" minDate="{CreateShipment>/min_date}" name="dataprevistacarregamento" required="true" value="{type: 'sap.ui.model.type.DateTime', formatOptions: {pattern: 'dd.MM.yyyy, HH:mm'}}" valueFormat="yyyy-MM-ddPTHH:mm:ssZ" displayFormat="dd.MM.yyyy, HH:mm"/>
 
                         <Label text="{i18n>matricula}"/>
-                        <Input id="unidadetransporte" name="unidadetransporte" type="Text" required="true" />
+                        <Input id="unidadetransporte" name="unidadetransporte" type="Text" />
                     </form:content>
                 </form:SimpleForm>
                 <form:SimpleForm maxContainerCols="1" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" emptySpanL="0" emptySpanM="0" editable="false" title="{i18n>loadsinfo}" columnsM="2" columnsL="3" columnsXL="4">

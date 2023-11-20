@@ -39,7 +39,7 @@
                     <Input id="Location" name="Location" required="true"/>
 
                     <Label text="{i18n>nif}" />
-                    <Input id="DestinationNif" name="DestinationNif" required="true"/>
+                    <Input type="Number" id="DestinationNif" name="DestinationNif" required="true"/>
 
                     <Label text="{i18n>postalcode}" />
                     <Input id="PostalCode" name="PostalCode" required="true"/>

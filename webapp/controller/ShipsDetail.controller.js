@@ -119,7 +119,7 @@ sap.ui.define([
                 this.setModel(oViewModel, "ShipsDetail");
                 this.setModel(oCompartimento, "CompartimentoData");
                 // this.getOwnerComponent().getRouter().attachRouteMatched(this.onObjectMatchedDetail, this);
-                
+
                 sap.ui.core.UIComponent.getRouterFor(this).getRoute("shipsdetail").attachPatternMatched(this.onPatternMatched, this);
 
                 document.addEventListener('keydown', this.onShortCutExecuteUpdate.bind(this));
@@ -316,7 +316,7 @@ sap.ui.define([
 
             onBuildGeneralDataSimpleForm: function (oAction) {
                 var oSimpleForm = this.byId("GeneralInfo");
-                
+
                 oSimpleForm.destroyContent();
 
                 var oToolbar = new sap.m.Toolbar({ ariaLabelledBy: "Title2" });
@@ -437,6 +437,14 @@ sap.ui.define([
                                                         text: oField.text
                                                     })
                                                 }
+                                            })
+                                        );
+                                    } else if (oField.id === "matricula") {
+                                        oSimpleForm.addContent(
+                                            new sap.m.Input({
+                                                id: oField.id,
+                                                name: oField.name,
+                                                value: oField.value
                                             })
                                         );
                                     } else {
@@ -731,24 +739,32 @@ sap.ui.define([
                                 var oItem = aItemsLoads[i];
                                 var oCellsLoads = oItem.getCells();
                                 if (oCellsLoads[0].getText() === oCodcompartimento) {
+                                    var match = oCellsLoads[3].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/);
+
+                                    var quantity = match[1];
+                                    var unit = match[3];
 
                                     oCodCompartimentoDestination.setValue(oCellsLoads[0].getText());
                                     oAccount.setValue(oCellsLoads[1].getText());
                                     oCommercialCod.setValue(oCellsLoads[2].getText());
-                                    oQuantity.setValue(oCellsLoads[3].getText());
-                                    oUnit.setSelectedKey(oCellsLoads[4].getText());
+                                    oQuantity.setValue(quantity);
+                                    oUnit.setSelectedKey(unit);
                                     break;
                                 }
                             }
                         } else {
                             var oCellsLoad = oSelectedItemLoads.getCells();
                             var oCodcompartimento = oCellsLoad[0].getText();
+                            var match = oCellsLoad[3].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/);
+
+                            var quantity = match[1];
+                            var unit = match[3];
 
                             oCodCompartimentoDestination.setValue(oCellsLoad[0].getText());
                             oAccount.setValue(oCellsLoad[1].getText());
                             oCommercialCod.setValue(oCellsLoad[2].getText());
-                            oQuantity.setValue(oCellsLoad[3].getText());
-                            oUnit.setSelectedKey(oCellsLoad[4].getText());
+                            oQuantity.setValue(quantity);
+                            oUnit.setSelectedKey(unit);
 
                             var aItemsDestinations = oTableDestination.getItems();
                             for (var i = 0; i < aItemsDestinations.length; i++) {
@@ -870,9 +886,13 @@ sap.ui.define([
                                 regime_alfandegario: this.aFields.find(({ id }) => id === 'regime_alfandegario').value,
                                 isencao_isp: this.aFields.find(({ id }) => id === 'isencao_isp').value,
                                 dataprevistacarregamento: sap.ui.getCore().byId("dataprevistacarregamento").getDateValue(),
-                                matricula: this.aFields.find(({ id }) => id === 'matricula').value,
+                                matricula: "",
                                 motorista: sap.ui.getCore().byId("drivername").getSelectedKey(),
                             };
+
+                        if (this.aFields.find(({ id }) => id === 'matricula').value) {
+                            oEntry.matricula = this.aFields.find(({ id }) => id === 'matricula').value;
+                        }
 
                         this.onBuildGeneralDataSimpleForm(1);
 
