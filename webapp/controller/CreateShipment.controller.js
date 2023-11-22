@@ -61,11 +61,20 @@ sap.ui.define([
                 }
             },
 
+            onAfterRendering: function () {
+                var that = this;
+                sessionStorage.setItem("goToLaunchpad", "");
+                window.addEventListener("message", function (event) {
+                    var data = event.data;
+                    if (data.action == "goToMainPage") {
+                        that.onNavBackCreate();
+                    }
+                });
+            },
 
             onObjectMatched: function (oEvent) {
                 this.onBindView("/" + oEvent.getParameter("config").pattern.replace("/{objectId}", "") + oEvent.getParameter("arguments").objectId);
             },
-
 
             onBindView: function (sObjectPath, bForceRefresh) {
                 this.getView().bindElement({
@@ -88,6 +97,7 @@ sap.ui.define([
             },
 
             onNavBackCreate: function (oEvent) {
+                sessionStorage.setItem("goToLaunchpad", "X");
                 var aContainers = [];
                 aContainers.push("GeneralInfo");
                 if (oEvent.getSource().getParent().getBindingContext()) {

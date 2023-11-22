@@ -44,6 +44,7 @@ sap.ui.define([
             },
 
             onPressShipmentDetail: function (oEvent) {
+                sessionStorage.setItem("goToLaunchpad", "");
                 var oSource = oEvent.getSource(),
                     sPath = oSource.getBindingContext().getPath();
 
@@ -55,14 +56,17 @@ sap.ui.define([
                 if (sessionStorage.getItem("selectedTheme").indexOf("dark") !== -1) {
                     this.byId("variantInput").removeStyleClass("variantMode");
                     this.byId("variantInput").addStyleClass("variantModeBlack");
+                    jQuery(".sapUiBlockLayer, .sapUiLocalBusyIndicator").css("background-color", "rgba(28,34,40,0.99)");
                 }
                 else {
                     this.byId("variantInput").removeStyleClass("variantModeBlack");
                     this.byId("variantInput").addStyleClass("variantMode");
+                    jQuery(".sapUiBlockLayer, .sapUiLocalBusyIndicator").css("background-color", "rgba(255, 255, 255, 0.99)");
                 }
             },
 
             onCreateShipment: function () {
+                sessionStorage.setItem("goToLaunchpad", "");
                 this.onRemoveSelection();
                 this.onNavigation("", "createshipment", "");
             },

@@ -272,6 +272,17 @@ sap.ui.define([
                 });
             },
 
+            onAfterRendering: function () {
+                var that = this;
+                sessionStorage.setItem("goToLaunchpad", "");
+                window.addEventListener("message", function (event) {
+                    var data = event.data;
+                    if (data.action == "goToMainPage") {
+                        that.onNavBackDetail();
+                    }
+                });
+            },
+
             onPatternMatched: function (oEvent) {
                 this.onBindViewDetail("/" + oEvent.getParameter("config").pattern.replace("/{objectId}", "") + oEvent.getParameter("arguments").objectId, true);
             },
@@ -910,6 +921,7 @@ sap.ui.define([
             },
 
             onNavBackDetail: function () {
+                sessionStorage.setItem("goToLaunchpad", "X");
                 var lanes = this.onVerifyLanes();
 
                 if (lanes) {

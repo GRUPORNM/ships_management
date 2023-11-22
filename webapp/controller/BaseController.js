@@ -79,6 +79,7 @@ sap.ui.define([
         },
 
         onNavBack: function () {
+            sessionStorage.setItem("goToLaunchpad", "X");
             this.onNavigation("", "main", "");
         },
 
