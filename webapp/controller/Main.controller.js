@@ -16,7 +16,7 @@ sap.ui.define([
                     oSmartTableView: "",
                     variantInput: "Standard"
                 });
-
+                sessionStorage.setItem("goToLaunchpad", "X");
                 this.setModel(oViewModel, "Main");
                 this.getRouter().attachRouteMatched(this.getUserAuthentication, this);
                 document.addEventListener('keydown', this.onShortcuts.bind(this));
@@ -52,7 +52,8 @@ sap.ui.define([
             },
 
             onAfterRendering: function () {
-                //DEPLOY
+                sessionStorage.setItem("goToLaunchpad", "X");
+
                 if (sessionStorage.getItem("selectedTheme").indexOf("dark") !== -1) {
                     this.byId("variantInput").removeStyleClass("variantMode");
                     this.byId("variantInput").addStyleClass("variantModeBlack");
