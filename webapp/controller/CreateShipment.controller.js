@@ -96,11 +96,12 @@ sap.ui.define([
                 }
             },
 
-            onNavBackCreate: function (oEvent) {
+            onNavBackCreate: function () {
                 sessionStorage.setItem("goToLaunchpad", "X");
                 var aContainers = [];
                 aContainers.push("GeneralInfo");
-                if (oEvent.getSource().getParent().getBindingContext()) {
+
+                if (this.byId("requestCreatePage").getParent().getBindingContext()) {
                     this.onManageContainerFieldsState("GeneralInfo", false);
 
                     this.onNavigation("", "main", "");
