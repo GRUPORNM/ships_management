@@ -2,6 +2,7 @@
   "controller/App.controller.js": "1704643200000",
   "controller/BaseController.js": "1704643200000",
   "controller/CreateShipment.controller.js": "1704643200000",
+  "controller/ShipsDetail.controller.js": "1704643200000",
   "controller/Main.controller.js": "1704643200000",
   "controller/NotFound.controller.js": "1704643200000"
 }

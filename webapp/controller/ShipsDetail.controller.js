@@ -132,7 +132,8 @@ sap.ui.define([
             },
 
             onLadesLoad: function (sObjectPath) {
-                var oModel = this.getModel();
+                var oModel = this.getModel(),
+                    oObject = oModel.getObject(sObjectPath);
 
                 oModel.read(sObjectPath, {
                     success: function (oData, response) {
