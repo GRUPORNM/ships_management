@@ -6,7 +6,7 @@
     xmlns:core="sap.ui.core"
     xmlns:uxap="sap.uxap"
     xmlns:commons="sap.suite.ui.commons">
-    <Page id="requestDetailPage" floatingFooter="true" title="{tknum}" showNavButton="false" navButtonPress="onNavBackDetail">
+    <Page id="requestDetailPage" floatingFooter="true" title="{nr_ordem_cliente}" showNavButton="false" navButtonPress="onNavBackDetail">
         <content>
             <uxap:ObjectPageLayout id="ObjectPageLayout" upperCaseAnchorBar="false">
 
@@ -52,9 +52,6 @@
                                             <Text text="{i18n>codcompartimento}" />
                                         </Column>
                                         <Column>
-                                            <Text text="{i18n>account_code}" />
-                                        </Column>
-                                        <Column>
                                             <Text text="{i18n>commercial_prod}" />
                                         </Column>
                                         <Column>
@@ -65,9 +62,9 @@
                                         <ColumnListItem>
                                             <cells>
                                                 <ObjectIdentifier text="{path : 'codcompartimento', formatter: '.formatter.codcompartimento'}" />
-                                                <ObjectIdentifier text="{codconta}" />
                                                 <ObjectIdentifier text="{maktx}" />
                                                 <ObjectIdentifier text="{quantprodcomercial} {unidademedida}" />
+                                                <ObjectIdentifier text="{codprodcomercial}" />
                                             </cells>
                                         </ColumnListItem>
                                     </items>

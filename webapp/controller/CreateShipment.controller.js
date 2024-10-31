@@ -36,6 +36,10 @@ sap.ui.define([
 
                     oCompartimento = new JSONModel({
                         items: []
+                    }),
+
+                    oDeletedCompartimento = new JSONModel({
+                        items: []
                     });
 
                 this.setModel(oViewModel, "CreateShipment");
@@ -43,6 +47,8 @@ sap.ui.define([
                 this.setModel(oShipHeader, "HeaderData");
                 this.setModel(oDestinationData, "DestinationData");
                 this.setModel(oCompartimento, "CompartimentoData");
+                this.setModel(oDeletedCompartimento, "DeletedCompartimentoData");
+
                 this.getOwnerComponent().getRouter().attachRouteMatched(this.onObjectMatched, this);
                 document.addEventListener('keydown', this.onShortCutExecuteUpdate.bind(this));
             },
@@ -119,28 +125,19 @@ sap.ui.define([
 
             onOpenShipmentDialog: function (oAction) {
                 var aDialogFields = [],
-                    oAccountCode = {
-                        oLabelText: this.getResourceBundle().getText("account_code"),
-                        oId: "AccountCode",
-                        oName: "AccountCode",
-                        oRequired: true,
-                        oValue: "",
-                        oType: "Number",
-                        oSelectedKey: "",
-                        oEnabled: true,
-                        oControl: sap.m.Input,
-                        oForceSelection: false
-                    },
                     oCommercialCod = {
                         oLabelText: this.getResourceBundle().getText("commercial_prod"),
+                        oItems: "/xTQAxMATERIALS_VH",
+                        oKey: "{matnr}",
+                        oText: "{maktx}",
                         oId: "CommercialCod",
                         oName: "CommercialCod",
                         oRequired: true,
-                        oValue: "",
-                        oSelectedKey: "",
                         oEnabled: true,
-                        oControl: sap.m.Input,
-                        oForceSelection: false
+                        oSelectedKey: "",
+                        oForceSelection: false,
+                        liveChange: true,
+                        oControl: sap.m.Select
                     },
                     oQuantity = {
                         oLabelText: this.getResourceBundle().getText("product_quantity"),
@@ -171,7 +168,7 @@ sap.ui.define([
                     oDialogInfo = {
                         oId: "LoadDialog",
                         oLayout: "ResponsiveGridLayout",
-                        oTitle: this.getResourceBundle().getText("DestinationDialog")
+                        oTitle: this.getResourceBundle().getText("LoadDialog")
                     },
                     aDialogButtons = [],
                     oCancelButton = {
@@ -195,8 +192,7 @@ sap.ui.define([
 
                 switch (oAction) {
                     case 'C':
-                        oAccountCode.oValue = "";
-                        oCommercialCod.oValue = "";
+                        oCommercialCod.oSelectedKey = "";
                         oQuantity.oValue = "";
                         oUnit.oSelectedKey = "";
 
@@ -209,8 +205,7 @@ sap.ui.define([
                             sPath = oTable.getSelectedContextPaths()[0],
                             oObject = this.getModel("LoadData").getData().items[sPath.replace("/items/", "")];
 
-                        oAccountCode.oValue = oObject.Codconta;
-                        oCommercialCod.oValue = oObject.Codprodcomercial;
+                        oCommercialCod.oSelectedKey = oObject.Codprodcomercial;
                         oQuantity.oValue = oObject.Quantprodcomercial;
                         oUnit.oSelectedKey = oObject.Unidademedida;
 
@@ -219,7 +214,7 @@ sap.ui.define([
                         break;
                 }
 
-                aDialogFields.push(oAccountCode, oCommercialCod, oQuantity, oUnit);
+                aDialogFields.push(oCommercialCod, oQuantity, oUnit);
 
                 this.buildDialogs(oDialogInfo, aDialogFields, aDialogButtons);
             },
@@ -231,20 +226,20 @@ sap.ui.define([
                     oLocation = this.byId("Location"),
                     oNif = this.byId("DestinationNif"),
                     oCPostal = this.byId("PostalCode");
+
                 if (!this.pDialog) {
                     this.pDialog = this.loadFragment({
                         name: "shipsmanagement.view.Destination"
                     });
                 }
+
                 switch (oAction) {
                     case 'C':
-
-                        this.pDialog.then(function (oDialog) {
-                            oDialog.open();
-                        });
+                        this.pDialog.then(function (oDialog) { oDialog.open(); });
                         break;
 
                     case 'U':
+
                         var oTable = this.byId("ShipsDestination"),
                             sPath = oTable.getSelectedContextPaths()[0],
                             oObject = this.getModel("DestinationData").getData().items[sPath.replace("/items/", "")];
@@ -260,6 +255,8 @@ sap.ui.define([
                         oNif.setValue(oObject.Nif);
                         oCPostal.setValue(oObject.Cpostal);
 
+                        this.byId("UpdateDestination").setProperty("visible", true);
+
                         this.pDialog.then(function (oDialog) {
                             oDialog.open();
                         });
@@ -269,6 +266,7 @@ sap.ui.define([
 
             onCloseFragment: function () {
                 this.onAfterFragment();
+                this.byId("ShipsDestination").removeSelections();
                 this.byId("DestinationDialog").close();
             },
 
@@ -423,11 +421,11 @@ sap.ui.define([
                 if (oHeaderFieldsChecked) {
                     var oEntry = {
                         Codinstalacao: this.byId("cod_instalacao").getValue(),
-                        Tipocarregamento: this.byId("tipo_carregamento").getSelectedKey(),
-                        Regimealfandegario: this.byId("regimealfadega").getSelectedKey(),
-                        Isencaoisp: this.byId("isencaoisp").getSelectedKey(),
-                        Dataprevistacarregamento: this.byId("dataprevistacarregamento").getDateValue(),
-                        Matricula: this.byId("unidadetransporte").getValue(),
+                        tipo_carregamento: this.byId("tipo_carregamento").getSelectedKey(),
+                        regimealfadega: this.byId("regimealfadega").getSelectedKey(),
+                        isencaoisp: this.byId("isencaoisp").getSelectedKey(),
+                        dataprevistacarregamento: this.byId("dataprevistacarregamento").getDateValue(),
+                        matricula: this.byId("matricula").getSelectedKey(),
                     };
                     oHeader.items.push(oEntry);
                     oModel.setData(oHeader);
@@ -483,7 +481,6 @@ sap.ui.define([
                 this.onManageContainerFieldsState("GeneralInfo", false);
             },
 
-            // Open Message Box
             onOpenMessageBox: function (oAction) {
                 var oMessage = {
                     oTitle: "",
@@ -500,7 +497,7 @@ sap.ui.define([
                         oMessage.oText = this.getResourceBundle().getText("deleteRowFromDriverDocumentation");
                         break;
                 }
-                this.showAlertMessage(oMessage, oAction);
+                this.showAlertMessageCreate(oMessage, oAction);
             },
 
             onCreateShipment: function () {
@@ -520,7 +517,8 @@ sap.ui.define([
                     var sPath = "/ShipmentsHeader",
                         oEntry = {
                             Codinstalacao: "1152",
-                            Codcliente: "0000000000000000",
+                            NrOrdemCliente: this.byId("nrodemcliente").getValue(),
+                            Codcliente: "104917",
                             Tipooperacao: "N",
                             Dataprevistacarregamento: this.byId("dataprevistacarregamento").getDateValue(),
                             Tipocarregamento: this.byId("tipo_carregamento").getSelectedKey(),
@@ -528,7 +526,9 @@ sap.ui.define([
                             Isencaoisp: this.byId("isencaoisp").getSelectedKey(),
                             Nacionalidademotorista: "PT",
                             Cartaconducaomotorista: "0000000000000000",
+                            Sealing: this.byId("sealing").getSelectedKey(),
                             Matricula: "",
+                            Reboque: "",
                             Toloads: [
                                 {
 
@@ -541,17 +541,21 @@ sap.ui.define([
                             ]
                         };
 
-                    if (this.byId("unidadetransporte").getValue()) {
-                        oEntry.Matricula = this.byId("unidadetransporte").getValue();
+                    if (this.byId("matricula").getValue()) {
+                        oEntry.Matricula = this.byId("matricula").getValue();
+                    }
+
+                    if (this.byId("reboque").getValue()) {
+                        oEntry.Reboque = this.byId("reboque").getValue();
                     }
 
                     oEntry.Toloads = this.getModel("LoadData").oData.items;
                     oEntry.Todestinations = this.getModel("DestinationData").oData.items;
 
                     for (var i = 0; i < oEntry.Toloads.length; i++) {
-                        var load = oEntry.Toloads[i];
-                        var destination = oEntry.Todestinations[i];
-                        var codcompartimento = load.Codcompartimento;
+                        var load = oEntry.Toloads[i],
+                            destination = oEntry.Todestinations[i],
+                            codcompartimento = load.Codcompartimento;
 
                         while (codcompartimento.length < 16) {
                             codcompartimento = "0" + codcompartimento;
@@ -583,23 +587,16 @@ sap.ui.define([
 
                 aButtons.push(oConfirmButton, oEditButton, oCancelButton);
 
-                // Manage header buttons state
                 this.onManageButtonsState(aButtons);
-
-                // Get container fields and set them enabled 
                 this.onManageContainerFieldsState("GeneralInfo", true);
             },
 
             onPressCancelShipmentHeader: function () {
                 var oDriver = this.getModel("HeaderData").oData.items[0];
-
-                // Validate if any field was edited
                 var sEdited = this.onValidateEditedFieldsHeader("GeneralInfo", oDriver);
 
                 if (sEdited) {
-                    // Show message box 
                     var that = this;
-
                     new sap.m.MessageBox.warning(this.getResourceBundle().getText("editShipHeaderDataText"), {
                         title: this.getResourceBundle().getText("editShipHeaderDataTitle"),
                         actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -611,7 +608,6 @@ sap.ui.define([
                                 if (oChecked) {
                                     that.onManageContainerFieldsState("GeneralInfo", false);
 
-                                    // Disable all header buttons
                                     var aButtons = [],
                                         oConfirmButton = {
                                             id: "SaveHeaderShipment",
@@ -627,18 +623,14 @@ sap.ui.define([
                                         };
 
                                     aButtons.push(oConfirmButton, oEditButton, oCancelButton);
-
-                                    // Manage header buttons state
                                     that.onManageButtonsState(aButtons);
                                 }
                             }
                         }
                     });
                 } else {
-                    // Disable all container fields
                     this.onManageContainerFieldsState("GeneralInfo", false);
 
-                    // Disable all header buttons
                     var aButtons = [],
                         oConfirmButton = {
                             id: "SaveHeaderShipment",
@@ -705,6 +697,87 @@ sap.ui.define([
                 this.onManageButtonsState(aButtons);
 
                 this.onManageContainerFieldsState("GeneralInfo", true);
+            },
+
+            onValueHelpRequest: function (oType) {
+                if (!this.oDefaultDialog) {
+                    this.oDefaultDialog = new sap.m.SelectDialog({
+                        id: "platesVh",
+                        title: this.getResourceBundle().getText("matricula"),
+                        multiSelect: false,
+                        rememberSelections: true,
+                        selectionChange: this.onChangeValueHelp.bind(this, oType),
+                        search: this.onSearchValueHelp.bind(this),
+                        items: {
+                            path: "/xTQAxEQUIPMENTS_VH",
+                            template: new sap.m.StandardListItem({
+                                title: "{eqktx}",
+                                description: "{status}"
+                            })
+                        },
+                    });
+
+                    this.getView().addDependent(this.oDefaultDialog);
+                    this.oDefaultDialog.open();
+
+                    this.oDefaultDialog.getBinding("items").filter([
+                        new sap.ui.model.Filter("eqart", sap.ui.model.FilterOperator.EQ, oType)
+                    ]);
+                } else {
+                    this.oDefaultDialog.destroy();
+
+                    this.oDefaultDialog = new sap.m.SelectDialog({
+                        id: "platesVh",
+                        title: this.getResourceBundle().getText("matricula"),
+                        multiSelect: false,
+                        rememberSelections: true,
+                        selectionChange: this.onChangeValueHelp.bind(this, oType),
+                        search: this.onSearchValueHelp.bind(this),
+                        items: {
+                            path: "/xTQAxEQUIPMENTS_VH",
+                            template: new sap.m.StandardListItem({
+                                title: "{eqktx}",
+                                description: "{status}"
+                            })
+                        },
+                    });
+
+                    this.getView().addDependent(this.oDefaultDialog);
+                    this.oDefaultDialog.open();
+
+                    this.oDefaultDialog.getBinding("items").filter([
+                        new sap.ui.model.Filter("eqart", sap.ui.model.FilterOperator.EQ, oType)
+                    ]);
+                }
+            },
+
+            onSearchValueHelp: function (oEntityProperties) {
+                var sValue = oEntityProperties.getParameter("value"),
+                    oFilter = new sap.ui.model.Filter("eqktx", sap.ui.model.FilterOperator.Contains, sValue),
+                    oBinding = oEntityProperties.getSource().getBinding("items");
+
+                oBinding.filter([oFilter]);
+            },
+
+            onChangeValueHelp: function (oType, oEntityProperties) {
+                var oSelectedItem = oEntityProperties.mParameters.listItem.mProperties,
+                    oInput;
+
+                if (oSelectedItem) {
+                    switch (oType) {
+                        case "T":
+                            oInput = this.byId("matricula");
+                            break;
+                        case "R":
+                            oInput = this.byId("reboque");
+                            break;
+                    }
+
+                    var sSelectedKey = oSelectedItem.title;
+                    if (oInput) {
+                        oInput.setValue(sSelectedKey);
+                    }
+                }
             },
         });
     });

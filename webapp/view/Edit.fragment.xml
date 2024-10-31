@@ -10,11 +10,12 @@
                     <Label text="{i18n>codcompartimento}" />
                     <Input id="CodCompartimento" name="CodCompartimento" required="true" enabled="false" />
 
-                    <Label text="{i18n>account_code}" />
-                    <Input type="Number" id="AccountCode" name="AccountCode" required="true"/>
-
                     <Label text="{i18n>commercial_prod}" />
-                    <Input id="CommercialCod" name="CommercialCod" required="true" />
+                    <Select id="CommercialCod" name="CommercialCod" items="{/xTQAxMATERIALS_VH}" required="true" forceSelection="false">
+                        <items>
+                            <core:Item key="{matnr}" text="{maktx}" />
+                        </items>
+                    </Select>
 
                     <Label text="{i18n>product_quantity}" />
                     <Input type="Number" id="Quantity" name="Quantity" required="true"/>

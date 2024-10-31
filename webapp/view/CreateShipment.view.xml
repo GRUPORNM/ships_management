@@ -23,6 +23,9 @@
                         <Label text="{i18n>plant}"/>
                         <Input id="cod_instalacao" name="cod_instalacao" type="Text" required="true" value="{i18n>cod_instalacao}" enabled="false" />
 
+                        <Label text="{i18n>nrodemcliente}"/>
+                        <Input id="nrodemcliente" name="nrodemcliente" type="Text" required="true" />
+
                         <Label text="{i18n>loadtype}"/>
                         <Select id="tipo_carregamento" name="tipo_carregamento" required="true" items="{
 							path: '/xTQAxLOAD_TYPE_VH'
@@ -43,12 +46,30 @@
 						}">
                             <core:Item key="{domvalue_l}" text="{exemption_isp}" />
                         </Select>
- 
+
                         <Label text="{i18n>plannedload}"/>
                         <DateTimePicker id="dataprevistacarregamento" minDate="{CreateShipment>/min_date}" name="dataprevistacarregamento" required="true" value="{type: 'sap.ui.model.type.DateTime', formatOptions: {pattern: 'dd.MM.yyyy, HH:mm'}}" valueFormat="yyyy-MM-ddPTHH:mm:ssZ" displayFormat="dd.MM.yyyy, HH:mm"/>
 
+                        <Label text="{i18n>sealing}"/>
+                        <Select id="sealing" name="sealing" items="{
+							path: '/xTQAxEQUIPMENT_SEALING_VH'
+						}">
+                            <core:Item key="{domvalue_l}" text="{ddtext}" />
+                        </Select>
+
                         <Label text="{i18n>matricula}"/>
-                        <Input id="unidadetransporte" name="unidadetransporte" type="Text" />
+                        <Input id="matricula" name="matricula" showSuggestion="true" showValueHelp="true" required="true" valueHelpRequest="onValueHelpRequest('T')">
+                            <suggestionItems>
+                                <core:Item key="eqktx" text="eqktx" />
+                            </suggestionItems>
+                        </Input>
+
+                        <Label text="{i18n>reboque}"/>
+                        <Input id="reboque" name="reboque" showSuggestion="true" showValueHelp="true" required="true" valueHelpRequest="onValueHelpRequest('R')">
+                            <suggestionItems>
+                                <core:Item key="eqktx" text="eqktx" />
+                            </suggestionItems>
+                        </Input>
                     </form:content>
                 </form:SimpleForm>
                 <form:SimpleForm maxContainerCols="1" layout="ResponsiveGridLayout" labelSpanL="12" labelSpanM="12" emptySpanL="0" emptySpanM="0" editable="false" title="{i18n>loadsinfo}" columnsM="2" columnsL="3" columnsXL="4">
@@ -67,9 +88,6 @@
                                     <Text text="{i18n>codcompartimento}" />
                                 </Column>
                                 <Column>
-                                    <Text text="{i18n>account_code}" />
-                                </Column>
-                                <Column>
                                     <Text text="{i18n>commercial_prod}" />
                                 </Column>
                                 <Column>
@@ -80,7 +98,6 @@
                                 <ColumnListItem>
                                     <cells>
                                         <ObjectIdentifier text="{LoadData>Codcompartimento}" />
-                                        <ObjectIdentifier text="{LoadData>Codconta}" />
                                         <ObjectIdentifier text="{LoadData>Codprodcomercial}" />
                                         <ObjectIdentifier text="{LoadData>Quantprodcomercial} {LoadData>Unidademedida}" />
                                     </cells>
@@ -137,7 +154,6 @@
             <OverflowToolbar>
                 <ToolbarSpacer/>
                 <Button text="{i18n>saveLoad}" type="Emphasized" press="onCreateShipment" />
-                <Button text="{i18n>closeDialog}" press="onNavBack"/>
             </OverflowToolbar>
         </footer>
     </Page>

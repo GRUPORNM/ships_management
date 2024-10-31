@@ -24,7 +24,7 @@
                     <Input id="DestinationNif" name="DestinationNif" required="true"/>
 
                     <Label text="{i18n>postalcode}" />
-                    <Input id="PostalCode" name="PostalCode" required="true"/>
+                    <Input id="PostalCode" name="PostalCode" maxLength="8" required="true"/>
                 </form:SimpleForm>
             </grid:Grid>
         </content>

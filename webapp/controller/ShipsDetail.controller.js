@@ -15,6 +15,13 @@ sap.ui.define([
                 name: "cod_instalacao"
             },
             {
+                id: "nr_ordem_cliente",
+                control: "sap.m.Text",
+                enabled: false,
+                value: "{nr_ordem_cliente}",
+                name: "nr_ordem_cliente"
+            },
+            {
                 id: "type_carregamento",
                 control: "sap.m.Select",
                 path: "/xTQAxLOAD_TYPE_VH",
@@ -22,7 +29,8 @@ sap.ui.define([
                 text: "{loadtype}",
                 value: "{tipo_carregamento}",
                 selectedKey: "{type_carregamento}",
-                name: "type_carregamento"
+                name: "type_carregamento",
+                required: true
             },
             {
                 id: "regime_alfandegario",
@@ -32,7 +40,8 @@ sap.ui.define([
                 text: "{regime_alfandegario_d}",
                 value: "{regimealfandega}",
                 selectedKey: "{regime_alfandegario}",
-                name: "regime_alfandegario"
+                name: "regime_alfandegario",
+                required: true
             },
             {
                 id: "isencao_isp",
@@ -42,19 +51,26 @@ sap.ui.define([
                 text: "{exemption_isp}",
                 value: "{isencaoisp}",
                 selectedKey: "{isencao_isp}",
-                name: "isencao_isp"
+                name: "isencao_isp",
+                required: true
             },
             {
                 id: "dataprevistacarregamento",
                 control: "sap.m.DatePicker",
                 value: "{dataprevistacarregamento}",
                 formatter: "true",
-                name: "dataprevistacarregamento"
+                name: "dataprevistacarregamento",
+                required: true
             },
             {
                 id: "matricula",
                 control: "sap.m.Text",
                 value: "{matricula}",
+                selectedKey: "{matricula}",
+                path: "/xTQAxEQUIPMENTS_VH",
+                key: "{eqktx}",
+                text: "{eqktx}",
+                type: "T",
                 name: "matricula"
             },
             {
@@ -66,6 +82,17 @@ sap.ui.define([
                 key: "{usrid}",
                 text: "{name}",
                 name: "drivername"
+            },
+            {
+                id: "sealing",
+                control: "sap.m.Select",
+                path: "/xTQAxEQUIPMENT_SEALING_VH",
+                key: "{domvalue_l}",
+                text: "{ddtext}",
+                visible: false,
+                value: "{sealing_text}",
+                selectedKey: "{sealing}",
+                name: "sealing",
             }
         ];
 
@@ -73,6 +100,10 @@ sap.ui.define([
             {
                 id: "cod_instalacao",
                 labelText: "plant"
+            },
+            {
+                id: "nr_ordem_cliente",
+                labelText: "nrodemcliente"
             },
             {
                 id: "type_carregamento",
@@ -97,8 +128,14 @@ sap.ui.define([
             {
                 id: "drivername",
                 labelText: "driver"
+            },
+            {
+                id: "sealing",
+                labelText: "sealing"
             }
         ]
+
+        this.sPath;
 
         return BaseController.extend("shipsmanagement.controller.ShipsDetail", {
 
@@ -116,12 +153,11 @@ sap.ui.define([
                         items: []
                     });
 
+                sessionStorage.setItem("goToLaunchpad", "");
                 this.setModel(oViewModel, "ShipsDetail");
                 this.setModel(oCompartimento, "CompartimentoData");
-                // this.getOwnerComponent().getRouter().attachRouteMatched(this.onObjectMatchedDetail, this);
 
                 sap.ui.core.UIComponent.getRouterFor(this).getRoute("shipsdetail").attachPatternMatched(this.onPatternMatched, this);
-
                 document.addEventListener('keydown', this.onShortCutExecuteUpdate.bind(this));
 
                 var oView = this.getView();
@@ -290,6 +326,7 @@ sap.ui.define([
 
             onBindViewDetail: function (sObjectPath, bForceRefresh) {
                 var that = this;
+                this.sPath = sObjectPath;
                 that.onLadesLoad(sObjectPath);
 
                 this.getView().bindElement({
@@ -451,12 +488,22 @@ sap.ui.define([
                                                 }
                                             })
                                         );
-                                    } else if (oField.id === "matricula") {
+                                    } else if (oField.id === "matricula" || oField.id === "reboque") {
                                         oSimpleForm.addContent(
                                             new sap.m.Input({
                                                 id: oField.id,
                                                 name: oField.name,
-                                                value: oField.value
+                                                selectedKey: oField.selectedKey,
+                                                showSuggestion: true,
+                                                showValueHelp: true,
+                                                valueHelpRequest: this.onValueHelpRequestPlate.bind(this, oField.type),
+                                                suggestionItems: {
+                                                    path: oField.path,
+                                                    template: new sap.ui.core.Item({
+                                                        key: oField.key,
+                                                        text: oField.text
+                                                    })
+                                                }
                                             })
                                         );
                                     } else {
@@ -465,7 +512,8 @@ sap.ui.define([
                                                 id: oField.id,
                                                 name: oField.name,
                                                 value: oField.value,
-                                                required: true
+                                                required: oField.required,
+                                                enabled: oField.enabled
                                             })
                                         );
                                     }
@@ -504,6 +552,7 @@ sap.ui.define([
                                         id: oField.id,
                                         name: oField.name,
                                         required: true,
+                                        forceSelection: false,
                                         items: {
                                             path: oField.path,
                                             template: new sap.ui.core.ListItem({
@@ -570,20 +619,101 @@ sap.ui.define([
                 }
             },
 
+            onValueHelpRequestPlate: function (oType) {
+                if (!this.oDefaultDialog) {
+                    this.oDefaultDialog = new sap.m.SelectDialog({
+                        id: "platesVh",
+                        title: this.getResourceBundle().getText("matricula"),
+                        multiSelect: false,
+                        rememberSelections: true,
+                        selectionChange: this.onChangeValueHelpPlate.bind(this, oType),
+                        search: this.onSearchValueHelpPlate.bind(this),
+                        items: {
+                            path: "/xTQAxEQUIPMENTS_VH",
+                            template: new sap.m.StandardListItem({
+                                title: "{eqktx}",
+                                description: "{status}"
+                            })
+                        },
+                    });
+
+                    this.getView().addDependent(this.oDefaultDialog);
+                    this.oDefaultDialog.open();
+
+                    this.oDefaultDialog.getBinding("items").filter([
+                        new sap.ui.model.Filter("eqart", sap.ui.model.FilterOperator.EQ, oType)
+                    ]);
+                } else {
+                    this.oDefaultDialog.destroy();
+
+                    this.oDefaultDialog = new sap.m.SelectDialog({
+                        id: "platesVh",
+                        title: this.getResourceBundle().getText("matricula"),
+                        multiSelect: false,
+                        rememberSelections: true,
+                        selectionChange: this.onChangeValueHelpPlate.bind(this, oType),
+                        search: this.onSearchValueHelpPlate.bind(this),
+                        items: {
+                            path: "/xTQAxEQUIPMENTS_VH",
+                            template: new sap.m.StandardListItem({
+                                title: "{eqktx}",
+                                description: "{status}"
+                            })
+                        },
+                    });
+
+                    this.getView().addDependent(this.oDefaultDialog);
+                    this.oDefaultDialog.open();
+
+                    this.oDefaultDialog.getBinding("items").filter([
+                        new sap.ui.model.Filter("eqart", sap.ui.model.FilterOperator.EQ, oType)
+                    ]);
+                }
+            },
+
             onSearchValueHelp: function (oEntityProperties) {
-                var sValue = oEntityProperties.getParameter("value");
-                var oFilter = new sap.ui.model.Filter("name", sap.ui.model.FilterOperator.Contains, sValue);
-                var oBinding = oEntityProperties.getSource().getBinding("items");
+                var sValue = oEntityProperties.getParameter("value"),
+                    oFilter = new sap.ui.model.Filter("eqktx", sap.ui.model.FilterOperator.Contains, sValue),
+                    oBinding = oEntityProperties.getSource().getBinding("items");
 
                 oBinding.filter([oFilter]);
+            },
+
+            onSearchValueHelpPlate: function (oEntityProperties) {
+                var sValue = oEntityProperties.getParameter("value"),
+                    oFilter = new sap.ui.model.Filter("eqktx", sap.ui.model.FilterOperator.Contains, sValue),
+                    oBinding = oEntityProperties.getSource().getBinding("items");
+
+                oBinding.filter([oFilter]);
+            },
+
+            onChangeValueHelpPlate: function (oType, oEntityProperties) {
+                var oSelectedItem = oEntityProperties.mParameters.listItem.mProperties,
+                    oInput;
+
+                if (oSelectedItem) {
+                    switch (oType) {
+                        case "T":
+                            oInput = sap.ui.getCore().byId("matricula");
+                            break;
+                        case "R":
+                            oInput = sap.ui.getCore().byId("reboque");
+                            break;
+                    }
+
+                    var sSelectedKey = oSelectedItem.title;
+                    if (oInput) {
+                        oInput.setValue(sSelectedKey);
+                    }
+                }
             },
 
             onChangeValueHelp: function (oEntityProperties) {
                 var oSelectedItem = oEntityProperties.mParameters.listItem.mProperties;
                 if (oSelectedItem) {
-                    var sSelectedKey = oSelectedItem.description;
+                    var sSelectedKey = oSelectedItem.description,
+                        oInput = sap.ui.getCore().byId("drivername");
 
-                    var oInput = sap.ui.getCore().byId("drivername");
                     if (oInput) {
                         oInput.setSelectedKey(sSelectedKey);
                     }
@@ -592,8 +722,9 @@ sap.ui.define([
 
             onShortCutExecuteUpdate: function (oEvent) {
                 if (sessionStorage.getItem("shortcuts") === 'true') {
-                    var that = this;
-                    var oEditable = sap.ui.getCore().byId("ConfirmButton").getVisible();
+                    var that = this,
+                        oEditable = sap.ui.getCore().byId("ConfirmButton").getVisible();
+
                     if (oEvent.which === 119) {
                         if (oEditable) {
                             that.onPressConfirmShipment();
@@ -626,23 +757,16 @@ sap.ui.define([
 
                 aButtons.push(oConfirmButton, oEditButton, oCancelButton);
 
-                // Manage header buttons state
                 this.onManageButtonsState(aButtons);
-
-                // Get container fields and set them enabled 
                 this.onManageContainerFieldsState("GeneralInfo", true);
             },
 
             onPressCancelShipHeaderButton: function () {
-                var oDriver = this.getModel().getObject(this.getView().getBindingContext().getPath());
-
-                // Validate if any field was edited
-                var sEdited = this.onValidateEditedFields("GeneralInfo", oDriver);
+                var oDriver = this.getModel().getObject(this.getView().getBindingContext().getPath()),
+                    sEdited = this.onValidateEditedFields("GeneralInfo", oDriver);
 
                 if (sEdited) {
-                    // Show message box 
                     var that = this;
-
                     new sap.m.MessageBox.warning(this.getResourceBundle().getText("editShipHeaderDataText"), {
                         title: this.getResourceBundle().getText("editShipHeaderDataTitle"),
                         actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -654,10 +778,8 @@ sap.ui.define([
                         }
                     });
                 } else {
-                    // Disable all container fields
                     this.onManageContainerFieldsState("GeneralInfo", false);
 
-                    // Disable all header buttons
                     var aButtons = [],
                         oConfirmButton = {
                             id: "ConfirmButton",
@@ -674,10 +796,8 @@ sap.ui.define([
 
                     aButtons.push(oConfirmButton, oEditButton, oCancelButton);
 
-                    // Manage header buttons state
                     this.onManageButtonsState(aButtons);
                 }
-
             },
 
             onPermToChange: function () {
@@ -707,18 +827,16 @@ sap.ui.define([
             },
 
             openEditDialog: function (oAction) {
-                var oView = this.getView();
-                var oName = this.byId("NameDestination");
-                var oLocation = this.byId("Location");
-                var oNif = this.byId("DestinationNif");
-                var oCPostal = this.byId("PostalCode");
-                var oCodCompartimento = this.byId("CodCompartimento");
-
-                var oAccount = this.byId("AccountCode");
-                var oCommercialCod = this.byId("CommercialCod");
-                var oQuantity = this.byId("Quantity");
-                var oUnit = this.byId("unit_vh");
-                var oCodCompartimentoDestination = this.byId("CodCompartimentoDestination");
+                var oView = this.getView(),
+                    oName = this.byId("NameDestination"),
+                    oLocation = this.byId("Location"),
+                    oNif = this.byId("DestinationNif"),
+                    oCPostal = this.byId("PostalCode"),
+                    oCodCompartimento = this.byId("CodCompartimento"),
+                    oCommercialCod = this.byId("CommercialCod"),
+                    oQuantity = this.byId("Quantity"),
+                    oUnit = this.byId("unit_vh"),
+                    oCodCompartimentoDestination = this.byId("CodCompartimentoDestination");
 
                 if (!this._oDialog) {
                     this._oDialog = sap.ui.xmlfragment(oView.getId(), "shipsmanagement.view.Edit", this);
@@ -730,15 +848,14 @@ sap.ui.define([
                         break;
 
                     case 'U':
-                        var oTableDestination = this.byId("ShipsDestination");
-                        var oSelectedItemDestination = oTableDestination.getSelectedItem();
-
-                        var oTableLoads = this.byId("ShipsLoads");
-                        var oSelectedItemLoads = oTableLoads.getSelectedItem();
+                        var oTableDestination = this.byId("ShipsDestination"),
+                            oSelectedItemDestination = oTableDestination.getSelectedItem(),
+                            oTableLoads = this.byId("ShipsLoads"),
+                            oSelectedItemLoads = oTableLoads.getSelectedItem();
 
                         if (oSelectedItemDestination) {
-                            var oCellsDestination = oSelectedItemDestination.getCells();
-                            var oCodcompartimento = oCellsDestination[0].getText();
+                            var oCellsDestination = oSelectedItemDestination.getCells(),
+                                oCodcompartimento = oCellsDestination[0].getText();
 
                             oCodCompartimento.setValue(oCellsDestination[0].getText());
                             oName.setValue(oCellsDestination[1].getText());
@@ -748,40 +865,38 @@ sap.ui.define([
 
                             var aItemsLoads = oTableLoads.getItems();
                             for (var i = 0; i < aItemsLoads.length; i++) {
-                                var oItem = aItemsLoads[i];
-                                var oCellsLoads = oItem.getCells();
-                                if (oCellsLoads[0].getText() === oCodcompartimento) {
-                                    var match = oCellsLoads[3].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/);
+                                var oItem = aItemsLoads[i],
+                                    oCellsLoads = oItem.getCells();
 
-                                    var quantity = match[1];
-                                    var unit = match[3];
+                                if (oCellsLoads[0].getText() === oCodcompartimento) {
+                                    var match = oCellsLoads[3].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/),
+                                        quantity = match[1],
+                                        unit = match[3];
 
                                     oCodCompartimentoDestination.setValue(oCellsLoads[0].getText());
-                                    oAccount.setValue(oCellsLoads[1].getText());
-                                    oCommercialCod.setValue(oCellsLoads[2].getText());
+                                    oCommercialCod.setSelectedKey(oCellsLoads[3].getText());
                                     oQuantity.setValue(quantity);
                                     oUnit.setSelectedKey(unit);
                                     break;
                                 }
                             }
                         } else {
-                            var oCellsLoad = oSelectedItemLoads.getCells();
-                            var oCodcompartimento = oCellsLoad[0].getText();
-                            var match = oCellsLoad[3].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/);
-
-                            var quantity = match[1];
-                            var unit = match[3];
+                            var oCellsLoad = oSelectedItemLoads.getCells(),
+                                oCodcompartimento = oCellsLoad[0].getText(),
+                                match = oCellsLoad[2].getText().match(/^(\d+(\.\d+)?)\s*(\w+)$/),
+                                quantity = match[1],
+                                unit = match[3];
 
                             oCodCompartimentoDestination.setValue(oCellsLoad[0].getText());
-                            oAccount.setValue(oCellsLoad[1].getText());
-                            oCommercialCod.setValue(oCellsLoad[2].getText());
+                            oCommercialCod.setSelectedKey(oCellsLoad[3].getText());
                             oQuantity.setValue(quantity);
                             oUnit.setSelectedKey(unit);
 
                             var aItemsDestinations = oTableDestination.getItems();
                             for (var i = 0; i < aItemsDestinations.length; i++) {
-                                var oItem = aItemsDestinations[i];
-                                var oCellsDestinations = oItem.getCells();
+                                var oItem = aItemsDestinations[i],
+                                    oCellsDestinations = oItem.getCells();
+
                                 if (oCellsDestinations[0].getText() === oCodcompartimento) {
 
                                     oCodCompartimento.setValue(oCellsDestinations[0].getText());
@@ -796,7 +911,6 @@ sap.ui.define([
 
                         this.byId("AddDestination").setProperty("visible", false);
                         this.byId("UpdateDestination").setProperty("visible", true);
-
                         this._oDialog.open();
                         break;
                 }
@@ -847,14 +961,11 @@ sap.ui.define([
             },
 
             onPressCancelShipment: function () {
-                var oShipment = this.getModel().getObject(this.getView().getBindingContext().getPath());
-
-                var sEdited = this.onValidateEditedFieldsHeader("GeneralInfo", oShipment);
+                var oShipment = this.getModel().getObject(this.getView().getBindingContext().getPath()),
+                    sEdited = this.onValidateEditedFieldsHeader("GeneralInfo", oShipment);
 
                 if (sEdited) {
-                    // Show message box 
                     var that = this;
-
                     new sap.m.MessageBox.warning(this.getResourceBundle().getText("editDriverHeaderDataText"), {
                         title: this.getResourceBundle().getText("editDriverHeaderDataTitle"),
                         actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -876,19 +987,18 @@ sap.ui.define([
             },
 
             onPressConfirmShipment: function () {
-                var oShipment = this.getModel().getObject(this.getView().getBindingContext().getPath()),
+                var oShipment = this.getModel().getObject(this.sPath),
                     sEdited = this.onValidateEditedFields("GeneralInfo", oShipment);
 
                 if (sEdited) {
                     var aControls = [sap.m.Input, sap.m.Select, sap.m.DatePicker],
                         aContainers = ["GeneralInfo"],
                         oMainControl = "";
-                    // Validate empty fields
+
                     var oChecked = this.checkEmptyFields(aControls, aContainers, oMainControl);
 
                     if (oChecked) {
-                        // Update entity
-                        var sPath = this.getView().getBindingContext().getPath(),
+                        var sPath = this.sPath,
                             oShipment = this.getModel().getObject(sPath),
                             oURLParams = new URLSearchParams(window.location.search),
                             oToken = oURLParams.get('token'),
@@ -900,6 +1010,7 @@ sap.ui.define([
                                 dataprevistacarregamento: sap.ui.getCore().byId("dataprevistacarregamento").getDateValue(),
                                 matricula: "",
                                 motorista: sap.ui.getCore().byId("drivername").getSelectedKey(),
+                                sealing: sap.ui.getCore().byId("sealing").getSelectedKey()
                             };
 
                         if (this.aFields.find(({ id }) => id === 'matricula').value) {
@@ -907,12 +1018,9 @@ sap.ui.define([
                         }
 
                         this.onBuildGeneralDataSimpleForm(1);
-
                         this.onUpdate(sPath, oEntry, oToken);
                     }
                 } else {
-
-                    // Show alert message box
                     new sap.m.MessageBox.warning(this.getResourceBundle().getText("noDataEditedDriverHeaderText"), {
                         title: this.getResourceBundle().getText("noDataEditedDriverHeaderTitle"),
                         actions: [sap.m.MessageBox.Action.OK],
@@ -922,24 +1030,21 @@ sap.ui.define([
             },
 
             onNavBackDetail: function () {
-                sessionStorage.setItem("goToLaunchpad", "X");
                 var lanes = this.onVerifyLanes();
 
                 if (lanes) {
-                    var oShipment = this.getModel().getObject(this.getView().getBindingContext().getPath());
-
-                    var sEdited = this.onValidateEditedFieldsHeader("GeneralInfo", oShipment);
+                    var oShipment = this.getModel().getObject(this.getView().getBindingContext().getPath()),
+                        sEdited = this.onValidateEditedFieldsHeader("GeneralInfo", oShipment);
 
                     if (sEdited) {
-                        // Show message box 
                         var that = this;
-
                         new sap.m.MessageBox.warning(this.getResourceBundle().getText("editDriverHeaderDataText"), {
                             title: this.getResourceBundle().getText("editDriverHeaderDataTitle"),
                             actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                             emphasizedAction: sap.m.MessageBox.Action.OK,
                             onClose: function (oAction) {
                                 if (oAction === sap.m.MessageBox.Action.OK) {
+                                    sessionStorage.setItem("goToLaunchpad", "X");
                                     sap.ui.getCore().byId("ConfirmButton").setProperty("visible", false);
                                     sap.ui.getCore().byId("CancelButton").setProperty("visible", false);
                                     sap.ui.getCore().byId("btChange").setProperty("visible", true);
@@ -950,11 +1055,13 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        sessionStorage.setItem("goToLaunchpad", "X");
                         this.onManageEnabledButtons();
                         this.onNavigation("", "main", "");
                         this.onCancelShip();
                     }
                 } else {
+                    sessionStorage.setItem("goToLaunchpad", "X");
                     this.byId("ShipsLoads").removeSelections();
                     this.byId("ShipsDestination").removeSelections();
                     this.onNavigation("", "main", "");
@@ -970,7 +1077,6 @@ sap.ui.define([
                 this.showAlertMessage(oMessage, 'R');
             },
 
-            // Open Message Box
             onOpenMessageBox: function (oAction) {
                 var oMessage = {
                     oTitle: "",
@@ -985,33 +1091,6 @@ sap.ui.define([
                 }
 
                 this.showAlertMessage(oMessage, oAction);
-            },
-
-            onDeleteLoad: function () {
-                var oTableLoads = this.byId("ShipsLoads"),
-                    oTableDestinations = this.byId("ShipsDestination"),
-                    oObjectLoad = oTableLoads.getSelectedContextPaths()[0],
-                    oObjectDestination = oTableDestinations.getSelectedContextPaths()[0];
-                if (oObjectLoad) {
-                    this.onDelete(oObjectLoad, new URLSearchParams(window.location.search).get('token'));
-                } else if (oObjectDestination) {
-                    this.onDelete(oObjectDestination, new URLSearchParams(window.location.search).get('token'));
-                }
-                this.byId("ShipsDestination").getBinding("items").refresh();
-                this.byId("ShipsLoads").getBinding("items").refresh();
-
-                if (oTableLoads.getItems().length == 1) {
-                    this.onManageEnabledButtons();
-                    oTableLoads.removeSelections();
-                    oTableDestinations.removeSelections();
-                } else {
-                    this.byId("EditShipmentLoad").setProperty("enabled", false);
-                    this.byId("DeleteShipmentLoad").setProperty("enabled", false);
-                    this.byId("EditShipmentDestination").setProperty("enabled", false);
-                    this.byId("DeleteShipmentDestination").setProperty("enabled", false);
-                    oTableLoads.removeSelections();
-                    oTableDestinations.removeSelections();
-                }
             },
 
             onCancelShip: function () {
@@ -1042,6 +1121,7 @@ sap.ui.define([
                     };
 
                 aButtons.push(oAddShipment, oEditShipment, oEditDestination, oAddShipmentDestination, oDeleteShipmentDestination, oDeleteShipmentLoad);
+
                 this.byId("ShipsLoads").removeSelections();
                 this.byId("ShipsDestination").removeSelections();
                 this.onManageButtonsState(aButtons);
@@ -1126,7 +1206,6 @@ sap.ui.define([
                 aButtons.push(oAddShipment, oEditShipment, oEditDestination, oAddShipmentDestination, oDeleteShipmentDestination, oDeleteShipmentLoad);
                 aButtonsVisible.push(oEditShipmentV, oEditDestinationV, oDeleteShipmentLoadV, oDeleteShipmentDestinationV);
 
-                // this.onManageButtonsState(aButtonsVisible);
                 this.onManageButtonsEnable(aButtons);
             },
 

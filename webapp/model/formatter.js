@@ -3,7 +3,7 @@ sap.ui.define([], function () {
 
     return {
         dateFormat: function (oDate) {
-            debugger;
+            
             if (oDate != null) {
                 var oDate = (oDate instanceof Date) ? oDate : new Date(oDate);
                 var dateFormat = sap.ui.core.format.DateFormat.getDateTimeInstance({ pattern: "dd.MM.yyyy HH:mm:ss" });
